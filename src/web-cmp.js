@@ -37,7 +37,6 @@ export let webCmp = (
         }
         attributeChangedCallback(attr, oldVal, newVal) {
             let f = attributes[attr]
-            console.log('---here', attr, f)
             if (f && typeof f ==='function') {
                 f.call(this, newVal, oldVal)
             }
@@ -52,7 +51,7 @@ export let webCmp = (
         connectedCallback() {
             setTimeout(() => {
                 this.refresh()
-                connectedCallback()
+                connectedCallback.call(this)
             })
         }
     }

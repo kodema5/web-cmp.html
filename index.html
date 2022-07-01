@@ -80,6 +80,7 @@ customElements.define('my-input', webCmp (
         // callback when connected
         //
         connectedCallback: function() {
+            console.log('----connected', this)
         },
 
 
@@ -93,7 +94,8 @@ customElements.define('my-input', webCmp (
         },
 
         // additional callback attribute-changed
-        attributeChangedCallback: function(attr, oldval, newval) {
+        attributeChangedCallback: function(attr, old, val) {
+            console.log('----attribute', this, attr, old, val)
         },
 
         // mostly for setter/getter
