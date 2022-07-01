@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+        crossorigin="anonymous">
+
+    <title>web-cmp.js</title>
+</head>
+<body>
+
+
+<script type="module">
+import { webCmp, template, getCssText, } from './web-cmp.js'
+
+customElements.define('my-input', webCmp (
+
+    // all functions will have "this" referred to cmp
+    //
+    template`
+    <style>
+        ${getCssText('bootstrap.min.css')}
+    </style>
+    <input
+        id="inputEl"
+        type="text"
+        class="form-control mb-2"
+    />
+    <slot name="title">list of words</slot>
+    <div id="wordsEl">
+        ${function() {
+
+            // on initial call, this can be empty
+            if (!this) return
+            let txt = this?.text || ''
+
+            // it can return
+            // a template, html-element, or html-string
+            //
+            return txt
+                .split(' ')
+                .map(a => a.trim())
+                .filter(Boolean)
+                .map(a => `<p>${a}</p>`)
+                .join('')
+        }}
+    </div>
+    `,
+
+    // configurations properties
+    // warning! be careful with names
+    {
+        // needed to be part of form.elements
+        // (default = true)
+        formAssociated:true,
+
+        // elements will be attached to component
+        //
+        elements: {
+            // property-keys are dom-selector
+            //
+            '#inputEl': {
+                // optional id field to override property-name
+                //
+                id: 'myInput',
+
+                // an event is prefixed by '$'
+                //
+                $input: function(e) {
+                    this.value = e.target.value
+                },
+
+            },
+        },
+
+        // attributes will be triggered if changed
+        // usually for initialization
+        //
+        attributes: {
+            value: function(val, old) {
+                this.value = val
+                this.myInput.value = val
+            }
+        },
+
+        // mostly for setter/getter
+        properties: {
+            value_: '',
+
+            get text() {
+                return String(this.value_ || '').toUpperCase()
+            },
+
+            get value() {
+                return this.value_
+            },
+
+            set value(a) {
+                this.value_= a
+                this.myInput.value = a
+                this.refresh()
+
+                // see: https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals
+                //
+                this.internals.setFormValue(a)
+            },
+
+            get name() {
+                return this.getAttribute('name')
+            },
+
+        },
+
+        // the rest are for overrides of properties/methods
+        // setter and getter does not work here
+        //
+        getValues: function() {
+            return { myValue: this.value_ }
+        }
+    }
+
+))
+
+</script>
+
+<div class="container">
+
+    <div class="row mb-3">
+    <div class="col-12">
+        <h1>web-components are awesome</h1>
+    </div>
+    </div>
+
+    <div class="row">
+    <div class="col-12">
+
+        <form id="form">
+        <my-input name="test" value="hello world">
+            <div slot="title">
+
+            <div class="text-end">
+                <button class="btn btn-primary" type="button" onclick="
+                console.log('---checking values')
+
+                // formData only accept strings
+                // console.log(Object.fromEntries(
+                //     (new FormData(document.getElementById('form')))
+                //     .entries()
+                // ))
+
+                console.log(Object.fromEntries(
+                    Array.from(document.getElementById('form'))
+                    .map(a => a.name ? [a.name, a.value] : null)
+                    .filter(Boolean)
+                ))
+
+            ">check form-values in console</button>
+            </div>
+            <h4>list of words</h4>
+            </div>
+
+        </my-input>
+        </form>
+
+
+    </div>
+    </div>
+
+</div>
+
+</body>
+</html>
