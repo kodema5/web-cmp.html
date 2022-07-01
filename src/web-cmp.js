@@ -2,8 +2,13 @@ export let webCmp = (
     tmpl,
     {
         formAssociated=true,
+
         elements={}, // properties and events
+        connectedCallback=() => {}, // callback when loaded
+
         attributes={}, // attribute changes
+        attributeChangedCallback=() => {}, // when attribute changed
+
         properties={},  // for computed properties
         ...overrides // other component overrides
     } = {}
@@ -32,8 +37,11 @@ export let webCmp = (
         }
         attributeChangedCallback(attr, oldVal, newVal) {
             let f = attributes[attr]
-            if (!f || typeof f !=='function') return
-            f.call(this, newVal, oldVal)
+            console.log('---here', attr, f)
+            if (f && typeof f ==='function') {
+                f.call(this, newVal, oldVal)
+            }
+            attributeChangedCallback.call(this, attr, oldVal, newVal)
         }
 
         // to be called to refresh content
@@ -42,7 +50,10 @@ export let webCmp = (
             this.template.refresh(this, this.shadowRoot)
         }
         connectedCallback() {
-            setTimeout(() => this.refresh())
+            setTimeout(() => {
+                this.refresh()
+                connectedCallback()
+            })
         }
     }
 

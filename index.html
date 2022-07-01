@@ -57,7 +57,8 @@ customElements.define('my-input', webCmp (
         // (default = true)
         formAssociated:true,
 
-        // elements will be attached to component
+
+        // elements will be attached and "wired" together
         //
         elements: {
             // property-keys are dom-selector
@@ -76,14 +77,23 @@ customElements.define('my-input', webCmp (
             },
         },
 
+        // callback when connected
+        //
+        connectedCallback: function() {
+        },
+
+
         // attributes will be triggered if changed
         // usually for initialization
         //
         attributes: {
             value: function(val, old) {
                 this.value = val
-                this.myInput.value = val
             }
+        },
+
+        // additional callback attribute-changed
+        attributeChangedCallback: function(attr, oldval, newval) {
         },
 
         // mostly for setter/getter
@@ -119,7 +129,8 @@ customElements.define('my-input', webCmp (
         //
         getValues: function() {
             return { myValue: this.value_ }
-        }
+        },
+
     }
 
 ))
