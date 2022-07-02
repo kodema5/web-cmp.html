@@ -62,19 +62,29 @@ customElements.define('my-input', webCmp (
         //
         elements: {
             // property-keys are dom-selector
+            // it will be applied to each selected
             //
-            '#inputEl': {
-                // optional id field to override property-name
-                //
-                id: 'myInput',
+            'input': function (el) {
+                return {
+                    // optional id field to override property-name
+                    //
+                    id: 'myInput',
 
-                // an event is prefixed by '$'
-                //
-                $input: function(e) {
-                    this.value = e.target.value
-                },
-
+                    // an event is prefixed by '$'
+                    //
+                    $input: function(e) {
+                        this.value = e.target.value
+                    },
+                }
             },
+
+            // alternatively an object
+            //
+            '#wordsEl': {
+                $click: function(e) {
+                    console.log('----clicked', this.wordsEl.innerHTML)
+                }
+            }
         },
 
         // callback when connected
