@@ -68,7 +68,7 @@ customElements.define('my-input', webCmp (
                 return {
                     // optional id field to override property-name
                     //
-                    id: 'myInput',
+                    id: 'inputEl',
 
                     // an event is prefixed by '$'
                     //
@@ -84,7 +84,16 @@ customElements.define('my-input', webCmp (
                 $click: function(e) {
                     console.log('----clicked', this.wordsEl.innerHTML)
                 }
-            }
+            },
+
+            // multiple config will be accumulated as long point to same element
+            //
+            '#inputEl': {
+                $blur: function() {
+                    console.log('----input blurred')
+                }
+            },
+
         },
 
         // callback when connected
@@ -122,7 +131,7 @@ customElements.define('my-input', webCmp (
 
             set value(a) {
                 this.value_= a
-                this.myInput.value = a
+                this.inputEl.value = a
                 this.refresh()
 
                 // see: https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals

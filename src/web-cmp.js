@@ -63,48 +63,56 @@ export let webCmp = (
 }
 
 let attachElements = (cmp, dom, elems) => {
-    Object.keys(elems).forEach(k => {
 
+    Object.entries(elems)
+    // collect element config
+    //
+    .reduce( (map, [k, f]) => {
         let els = (k==='.' || k==='this')
             ? [dom]
             : dom.querySelectorAll(k)
-        if (!els.length===0) return
+        if (!els.length===0) return map
 
         els.forEach(el => {
-            // get config
-            //
-            let f = elems[k]
             let cfg = typeof(f)==='function'
                 ? f.call(cmp, el)
                 : {...f}
-            let id = cfg.id || el.id
-            delete cfg.id
 
-            // attach element as properties
-            //
-            if (id && el!==dom) {
-                if (cmp[id]) return
-                cmp[id] = el
-            }
-
-            // attach listeners/properties to element
-            // all functions' this refer to 'cmp'
-            //
-            Object.entries(cfg).forEach( ([key, fn]) => {
-                let isFn = typeof fn==='function'
-
-                if (key[0]=='$' && isFn) {
-                    el.addEventListener(key.slice(1), fn.bind(cmp))
-                    return
-                }
-
-                el[key] = isFn
-                    ? fn.bind(cmp)
-                    : fn // -- is a property
-            })
+            map.set(el, Object.assign(
+                map.get(el) || {},
+                cfg
+            ))
         })
 
+        return map
+    }, new Map())
 
+    // apply config to each element
+    //
+    .forEach((cfg, el) => {
+        let id = cfg.id || el.id
+        delete cfg.id
+
+        if (id && el!==dom) {
+            if (cmp[id]) return
+            cmp[id] = el
+        }
+
+        // attach listeners/properties to element
+        // all functions' this refer to 'cmp'
+        //
+        Object.entries(cfg).forEach( ([evt, fn]) => {
+            let isFn = typeof fn==='function'
+
+            if (evt[0]=='$' && isFn) {
+                el.addEventListener(evt.slice(1), fn.bind(cmp))
+                return
+            }
+
+            el[evt] = isFn
+                ? fn.bind(cmp)
+                : fn // -- is a property
+        })
     })
 }
 
