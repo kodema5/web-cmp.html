@@ -5,3 +5,5 @@ export { template, Template } from './template.js'
 export { webCmp, } from './web-cmp.js'
 
 export { getCssText, } from './css.js'
+
+export { El, } from './el.js'
